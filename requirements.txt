@@ -1,3 +1,4 @@
+libg1-mesa-glx
 streamlit
 matplotlib
 numpy

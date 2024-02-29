@@ -1,4 +1,4 @@
 libg1-mesa-glx
-streamlit
-matplotlib
-numpy
+streamlit==1.31.1
+matplotlib==3.8.3
+numpy==1.26.4

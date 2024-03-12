@@ -40,24 +40,32 @@ def mycomp(sol,Mol_Num,Plate_num,Gas_phase,Liq_Phase):
     return Gas_phase,Liq_Phase
 
 
+
+
 # hier begins the main
 
 
 #plt.ion()
 
 
-
-
 #Input Parameters
 # Placeholder for the plot
-Plate_num = int(st.number_input('Enter Plate Number: ',5,200,50))
+
+
+col_len = int(st.number_input('Enter Column Length(in CM):',0,100,50))
+Car_Velo = float(st.number_input('Enter Column Carrier velocity(m/s):',0.0,10.0,0.1))
+Holdup_time = 0.01 * col_len / Car_Velo # Calcualte the Hold up time in Seconds
+
+Plate_num =128    # I've deliberatly fixed the plate number to avoid the programme running slow
+
+Mol_Num = int(st.number_input('Enter Number of Molecules: ',1,3200000,32))
+# for the sake of visualization, Concentration is importatn. otherwiese it doesn't influence the calculations
+
 
 placeholder = st.empty()
-Mol_Num = 32000                  #Number of Molecuels in sample
-#Plate_num = 200                 #Column effitiency
-#equilibria = Plate_num
+
 equlib_time = 4/Plate_num        #Equilibrium time in sec
-sol =[0.01,0.25,0.5,0.75]        #Solubility
+sol =[0.0,0.25,0.5,0.75]        #Solubility
 #Component 1
 [Gas_phase1,Liq_phase1] = initialization(sol[0],Mol_Num,Plate_num)
 #Component 2
@@ -68,10 +76,9 @@ sol =[0.01,0.25,0.5,0.75]        #Solubility
 [Gas_phase4,Liq_phase4] = initialization(sol[3],Mol_Num,Plate_num)
 
 
-#chart = st.line_chart(Gas_phase1)
-#ax.clear()
 
-#st.write(user_input+1)
+
+# Creat Start and Stop button
 flag = 0
 
 Start= st.button("Start")
@@ -81,44 +88,31 @@ if Start:
 elif Stop:
     flag =0
 
+# sliders to set the Solubility
 sol[1] = 0.01 * st.slider('Comp1 Solubility', 0, 100, 25)
 sol[2] = 0.01 * st.slider('Comp2 Solubility', 0, 100, 50)
 sol[3] = 0.01 * st.slider('Comp3 Solubility', 0, 100, 75)
 
 
 fig,ax = plt.subplots()
+# if Start is pressed
 if flag:
 
-    for iter in range(Plate_num):
+    for iter in range(Plate_num*4):
+
         [Gas_phase1, Liq_phase1] = mycomp(sol[0],Mol_Num,Plate_num,Gas_phase1,Liq_phase1)
         [Gas_phase2, Liq_phase2] = mycomp(sol[1], Mol_Num, Plate_num, Gas_phase2, Liq_phase2)
         [Gas_phase3, Liq_phase3] = mycomp(sol[2], Mol_Num, Plate_num, Gas_phase3, Liq_phase3)
         [Gas_phase4, Liq_phase4] = mycomp(sol[3], Mol_Num, Plate_num, Gas_phase4, Liq_phase4)
         fig, ax = plt.subplots()
-        #ax.clear()
-        #pos_Gas_phase1 = list(filter(lambda x: x > 0.1, Gas_phase1))
-        #pos_Gas_phase2 = list(filter(lambda x: x > 0.1, Gas_phase2))
-        #st.line_chart(Gas_phase1)
-        #chart.bar_chart(Gas_phase1)
-        #chart.line_chart(Gas_phase2)
+
 
         fig, ax = plt.subplots()
-        ax.plot(Gas_phase1,label='wave1')
-        ax.plot(Gas_phase2,label = 'wave2')
-        ax.plot(Gas_phase3,label = 'wave3')
-        ax.plot(Gas_phase4,label = 'wave4')
+        ax.plot(np.linspace(0,col_len,Plate_num),Gas_phase1,label='wave1')
+        ax.plot(np.linspace(0,col_len,Plate_num),Gas_phase2,label = 'wave2')
+        ax.plot(np.linspace(0,col_len,Plate_num),Gas_phase3,label = 'wave3')
+        ax.plot(np.linspace(0,col_len,Plate_num),Gas_phase4,label = 'wave4')
         placeholder.pyplot(fig)
-        ax.legend('fuck','fuck2')
         # Clear the plot to avoid slowdowns
         plt.close(fig)
-
-
-
-
-
-
-
-
-
-
-
+        time.sleep(Holdup_time/Plate_num)
